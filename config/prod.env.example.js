@@ -1,3 +1,4 @@
+// 请在同目录下新建一个 prod.env.js 配置文件，用于配置生产环境，配置说明如下。
 module.exports = {
     mysql: {
         host: 'mysql host',

@@ -1,3 +1,4 @@
+// 请在同目录下新建一个 deploy.config.js 配置文件，配置说明如下。
 module.exports = {
     production : {
        "user" : "部署服务器的用户名",
