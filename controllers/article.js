@@ -1,5 +1,4 @@
 const express = require('express');
-const xss = require("xss");
 const router = express.Router();
 const indexSQL = require('../sql');
 const utilsHelper = require('../utils/utils');
@@ -289,8 +288,6 @@ router.get('/page_by_tag', function (req, res, next) {
 router.post('/add', function (req, res, next) {
     const connection = req.connection;
     const param = req.body;
-    // XSS防护
-    param.content = xss(pararm.content)
     let articleId;
     let newCategoryIds = [];
     let tagIds = [];
@@ -503,7 +500,7 @@ router.put('/update', function (req, res, next) {
                     const updateArticleParam = {
                         article_name: param.articleTitle,
                         // XSS防护
-                        article_text: xss(param.articleText),
+                        article_text: param.articleText,
                         poster: param.poster,
                         summary: param.summary,
                         private: param.private,
