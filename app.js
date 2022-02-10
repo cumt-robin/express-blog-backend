@@ -3,7 +3,6 @@ const express = require('express');
 const path = require('path');
 const logger = require('morgan');
 const cookieParser = require('cookie-parser');
-const bodyParser = require('body-parser');
 const session = require('express-session');
 const helmet = require('helmet')
 // const compression = require('compression');
@@ -13,16 +12,14 @@ const ws = require('./utils/ws');
 
 const app = express();
 
-// 完善http头部，提高安全性
-app.use(helmet());
-
-// 如果使用Nginx，则在nginx处理gzip即可
-// app.use(compression());
-
 const server = http.createServer(app);
 const io = require('socket.io')(server);
 
-// session中间件
+// view engine setup
+app.set('views', path.join(__dirname, 'views'));
+app.set('view engine', 'ejs');
+app.set('port', process.env.PORT || '3000');
+
 const sesisonMiddleware = session({
   secret: 'llwb', 
   cookie: ({ path: '/', httpOnly: true, secure: false, maxAge: null }),
@@ -30,17 +27,19 @@ const sesisonMiddleware = session({
   saveUninitialized: true
 });
 
-// view engine setup
-app.set('views', path.join(__dirname, 'views'));
-app.set('view engine', 'ejs');
-app.set('port', process.env.PORT || '3000');
-
+// 如果使用Nginx，则在nginx处理gzip即可
+// app.use(compression());
+// 完善http头部，提高安全性
+app.use(helmet());
+// session 中间件
 app.use(sesisonMiddleware);
+// 日志中间件
 app.use(logger('dev'));
-// parse application/json
-app.use(bodyParser.json());
-// parse application/x-www-form-urlencoded
-app.use(bodyParser.urlencoded({ extended: false }));
+// parse application/json，express@4.16.0内置，替代了 body-parser
+app.use(express.json());
+// parse application/x-www-form-urlencoded，替代了 body-parser
+app.use(express.urlencoded({ extended: false }));
+// 解析得到 req.cookies
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 

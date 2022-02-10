@@ -18,7 +18,6 @@
     },
     "homepage": "https://blog.wbjiang.cn/",
     "dependencies": {
-        "body-parser": "~1.18.2",
         "compression": "^1.7.3",
         "cookie-parser": "~1.4.3",
         "debug": "~2.6.9",
@@ -27,7 +26,7 @@
         "express-session": "~1.17.2",
         "helmet": "^3.18.0",
         "morgan": "~1.9.0",
-        "mysql": "^2.16.0",
+        "mysql": "~2.18.1",
         "nodemailer": "^4.6.8",
         "serve-favicon": "~2.4.5",
         "socket.io": "^2.1.1",
