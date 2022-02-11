@@ -25,6 +25,9 @@ router.get('/all', function(req, res, next) {
     });
 });
 
+/**
+ * 获取分类总数
+ */
 router.get('/count', function(req, res, next) {
     const connection = req.connection;
     connection.query(indexSQL.GetCategoryCount, function(error, results, fileds) {

@@ -82,7 +82,7 @@ router.get('/current', function (req, res, next) {
 });
 
 /**
- * @description 忘记密码
+ * @description 忘记密码，暂未实现后续重置密码操作
  */
 router.get('/forgetpwd', function (req, res, next) {
 	req.connection.release();

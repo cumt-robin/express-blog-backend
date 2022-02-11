@@ -1,11 +1,16 @@
 const express = require('express');
 const router = express.Router();
 // const config = require('../config');
-const dbService = require('../utils/db');
+const dbUtils = require('../utils/db');
 const indexSQL = require('../sql');
 const errcode = require("../utils/errcode");
 const authMap = require('../permissions/auth');
 
+/**
+ * base controller
+ * 权限验证
+ * 数据库连接池
+ */
 router.use(function(req, res, next) {
     // CORS 处理，已交给 Nginx 处理
     // if (req.headers.origin) {
@@ -23,7 +28,7 @@ router.use(function(req, res, next) {
         // 需要检验token的接口
         if (req.cookies.token) {
             // 从mysql连接池取得connection
-            dbService.getConnection(function (connection) {
+            dbUtils.getConnection(function (connection) {
                 req.connection = connection;
                 connection.query(indexSQL.GetCurrentUser, [req.cookies.token], function (error, results, fileds) {
                     // token是否有效
@@ -69,7 +74,7 @@ router.use(function(req, res, next) {
             next();
         } else {
             // 从mysql连接池取得connection
-            dbService.getConnection(function (connection) {
+            dbUtils.getConnection(function (connection) {
                 req.connection = connection;
                 next();
             }, function (err) {

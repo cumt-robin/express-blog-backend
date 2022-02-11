@@ -6,13 +6,9 @@ function handleTask(promiseTask, respList) {
     if (promiseTask.children) {
         return promiseTask.task().then((resp) => {
             respList.push(resp)
-            promiseTask.children = promiseTask.children.filter(item => {
-                return !!item
-            })
+            promiseTask.children = promiseTask.children.filter(item => !!item)
             return Promise.all(
-                promiseTask.children.map(item => {
-                    return handleTask(item, respList)
-                })
+                promiseTask.children.map(item => handleTask(item, respList))
             )
         })
     } else {
@@ -24,12 +20,8 @@ function handleTask(promiseTask, respList) {
 
 function handlePromiseList(list) {
     const respList = [];
-    list = list.filter(function(item) {
-        return item != null;
-    });
-    const handledList = list.map((item) => {
-        return handleTask(item, respList);
-    });
+    const validList = list.filter(item => item != null);
+    const handledList = validList.map((item) => handleTask(item, respList));
     return Promise.all(handledList).then(() => {
         return respList;
     });

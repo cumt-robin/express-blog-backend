@@ -2,7 +2,7 @@ const express = require('express');
 const router = express.Router();
 const indexSQL = require('../sql');
 const utilsHelper = require('../utils/utils');
-const transactionHelper = require('../utils/transaction');
+const transactionUtils = require('../utils/transaction');
 const errcode = require('../utils/errcode');
 
 /**
@@ -462,7 +462,7 @@ router.post('/add', function (req, res, next) {
         }
     ];
     const handledTaskList = utilsHelper.handlePromiseList(allTaskList);
-    transactionHelper.doTransaction(connection, handledTaskList).then(allResp => {
+    transactionUtils.doTransaction(connection, handledTaskList).then(allResp => {
         connection.release();
         res.send({
             code: allResp ? '0' : '002001'
@@ -471,7 +471,8 @@ router.post('/add', function (req, res, next) {
         connection.release();
         // 插入失败
         res.send({
-            code: '002001'
+            code: '002001',
+            msg: "发布失败"
         });
     });
 });
@@ -724,7 +725,7 @@ router.put('/update', function (req, res, next) {
         } : null
     ];
     const handledTaskList = utilsHelper.handlePromiseList(allTaskList);
-    transactionHelper.doTransaction(connection, handledTaskList).then(allResp => {
+    transactionUtils.doTransaction(connection, handledTaskList).then(allResp => {
         connection.release();
         res.send({
             code: allResp ? '0' : '002001'
@@ -733,7 +734,8 @@ router.put('/update', function (req, res, next) {
         connection.release();
         // 插入失败
         res.send({
-            code: '002001'
+            code: '002001',
+            msg: "更新失败"
         });
     });
 });
@@ -741,7 +743,7 @@ router.put('/update', function (req, res, next) {
 
 /**
  * 
- * @param {Obeject} item 单篇博客数据
+ * @param {Obeject} item 单篇博客数据处理
  * @description 处理分类和标签信息
  */
 function handleCategoryAndTag(item) {
