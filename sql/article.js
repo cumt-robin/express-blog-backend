@@ -11,7 +11,7 @@ module.exports = {
         ORDER BY a.create_time DESC LIMIT ?, ?;\
     SELECT FOUND_ROWS() AS total;',
     // admin分页查询文章及总数量，并通过左连接查询出相关分类与标签
-    GetArticlePageAdmin: 'SELECT SQL_CALC_FOUND_ROWS a.id, a.article_name, a.poster, a.read_num, a.create_time, a.update_time, u.nick_name AS author, GROUP_CONCAT(DISTINCT c.id SEPARATOR " ") AS categoryIDs, GROUP_CONCAT(DISTINCT c.category_name SEPARATOR " ") AS categoryNames, GROUP_CONCAT(DISTINCT t.id SEPARATOR " ") AS tagIDs, GROUP_CONCAT(DISTINCT t.tag_name SEPARATOR " ") AS tagNames FROM article a\
+    GetArticlePageAdmin: 'SELECT SQL_CALC_FOUND_ROWS a.id, a.article_name, a.poster, a.read_num, a.create_time, a.update_time, a.private, a.deleted, u.nick_name AS author, GROUP_CONCAT(DISTINCT c.id SEPARATOR " ") AS categoryIDs, GROUP_CONCAT(DISTINCT c.category_name SEPARATOR " ") AS categoryNames, GROUP_CONCAT(DISTINCT t.id SEPARATOR " ") AS tagIDs, GROUP_CONCAT(DISTINCT t.tag_name SEPARATOR " ") AS tagNames FROM article a\
         LEFT JOIN user u ON a.author_id = u.id\
         LEFT JOIN article_category a_c ON a.id = a_c.article_id\
         LEFT JOIN category c ON a_c.category_id = c.id\

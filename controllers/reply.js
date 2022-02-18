@@ -4,12 +4,12 @@ const router = express.Router();
 const indexSQL = require('../sql');
 const config = require('../config');
 const emailHandler = require('../utils/email');
+const dbUtils = require('../utils/db');
 
 /**
  * @description 添加回复
  */
 router.post('/add', function (req, res, next) {
-    const connection = req.connection;
     const params = Object.assign(req.body, {
         create_time: new Date(),
     })
@@ -17,10 +17,9 @@ router.post('/add', function (req, res, next) {
     if (params.content) {
         params.content = xss(params.content)
     }
-    const isComment = !!param.article_id
+    const isComment = !!params.article_id
     const wd = isComment ? '评论' : '留言'
-    connection.query(indexSQL.AddReply, params, function (error, results, fileds) {
-        connection.release();
+    dbUtils.query({ sql: indexSQL.AddReply, values: params }).then(({ results }) => {
         if (results) {
             const mailOptions = {
                 from: `"${config.blogName}" <${config.email.auth.user}>`,
@@ -50,9 +49,7 @@ router.post('/add', function (req, res, next) {
  * @description 查询待审核的评论回复
  */
 router.get('/getReplyOfCommentWaitReview', function (req, res, next) {
-    const connection = req.connection;
-    connection.query(indexSQL.GetReplyOfCommentWaitReview, function (error, results, fileds) {
-        connection.release();
+    dbUtils.query(indexSQL.GetReplyOfCommentWaitReview).then(({ results }) => {
         if (results) {
             res.send({
                 code: '0',
@@ -66,16 +63,14 @@ router.get('/getReplyOfCommentWaitReview', function (req, res, next) {
                 msg: '查询失败'
             });
         }
-    });
+    })
 })
 
 /**
  * @description 查询待审核的留言回复
  */
 router.get('/getReplyOfMsgWaitReview', function (req, res, next) {
-    const connection = req.connection;
-    connection.query(indexSQL.GetReplyOfMsgWaitReview, function (error, results, fileds) {
-        connection.release();
+    dbUtils.query(indexSQL.GetReplyOfMsgWaitReview).then(({ results }) => {
         if (results) {
             res.send({
                 code: '0',
@@ -98,14 +93,12 @@ router.get('/getReplyOfMsgWaitReview', function (req, res, next) {
  * @description 分页查询未审核的留言回复
  */
 router.get('/unreviewd_reply_page', function (req, res, next) {
-    const connection = req.connection;
     const params = req.query;
     const pageNo = Number(params.pageNo || 1);
     const pageSize = Number(params.pageSize || 10);
-    const sql =  params.type == 1 ? indexSQL.QueryUnreviewedCommentReplyPage : indexSQL.QueryUnreviewedMessageReplyPage
+    const sql = params.type == 1 ? indexSQL.QueryUnreviewedCommentReplyPage : indexSQL.QueryUnreviewedMessageReplyPage
     const sqlParams = [(pageNo - 1) * pageSize, pageSize]
-    connection.query(sql, sqlParams, function (error, results, fileds) {
-        connection.release();
+    dbUtils.query({ sql, values: sqlParams }).then(({ results }) => {
         if (results) {
             res.send({
                 code: '0',
@@ -118,24 +111,22 @@ router.get('/unreviewd_reply_page', function (req, res, next) {
                 data: []
             });
         }
-    });
+    })
 });
 
 /**
  * @description 审核回复
  */
 router.put('/review', function (req, res, next) {
-    const connection = req.connection;
-    const param = req.body;
-    connection.query(indexSQL.UpdateApprovedByReplyID, [param.approved, param.id], function (error, results, fileds) {
-        connection.release();
+    const params = req.body;
+    dbUtils.query({ sql: indexSQL.UpdateApprovedByReplyID, values: [params.approved, params.id] }).then(({ results }) => {
         if (results) {
-            if (Number(param.approved) === 1 && param.email) {
+            if (Number(params.approved) === 1 && params.email) {
                 // 发个邮件通知下
-                if (!param.jump_url) {
-                    param.jump_url = config.siteURL
+                if (!params.jump_url) {
+                    params.jump_url = config.siteURL
                 }
-                emailHandler.replyEmailForMessage(param.email, '回复', param.content, param.jump_url)
+                emailHandler.replyEmailForMessage(params.email, '回复', params.content, params.jump_url)
             }
             res.send({
                 code: '0',

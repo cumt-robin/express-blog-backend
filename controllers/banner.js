@@ -1,14 +1,13 @@
 const express = require('express');
 const router = express.Router();
 const indexSQL = require('../sql');
+const dbUtils = require('../utils/db');
 
 /**
  * @description 获得所有PC banner
  */
 router.get('/pc', function(req, res, next) {
-    const connection = req.connection;
-    connection.query(indexSQL.GetPcBanners, function(error, results, fileds) {
-        connection.release();
+    dbUtils.query(indexSQL.GetPcBanners).then(({ results }) => {
         if (results) {
             res.send({
                 code: '0',
@@ -27,9 +26,7 @@ router.get('/pc', function(req, res, next) {
  * @description 获得所有小程序 banner
  */
 router.get('/weapp', function(req, res, next) {
-    const connection = req.connection;
-    connection.query(indexSQL.GetWeappBanners, function(error, results, fileds) {
-        connection.release();
+    dbUtils.query(indexSQL.GetWeappBanners).then(({ results }) => {
         if (results) {
             res.send({
                 code: '0',
@@ -37,7 +34,7 @@ router.get('/weapp', function(req, res, next) {
             });
         } else {
             res.send({
-                code: '013001',
+                code: '013002',
                 data: []
             });
         }

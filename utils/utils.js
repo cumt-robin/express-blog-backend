@@ -4,14 +4,18 @@ function getType(obj) {
 
 function handleTask(promiseTask, respList) {
     if (promiseTask.children) {
+        // 如果有 children 任务，处理完 task 后，再处理 children
         return promiseTask.task().then((resp) => {
             respList.push(resp)
+            // 过滤掉为空的 children item
             promiseTask.children = promiseTask.children.filter(item => !!item)
+            // children 并行递归处理
             return Promise.all(
                 promiseTask.children.map(item => handleTask(item, respList))
             )
         })
     } else {
+        // 没有 children 任务，处理完 task 直接返回
         return promiseTask.task().then(resp => {
             respList.push(resp)
         })
@@ -19,9 +23,13 @@ function handleTask(promiseTask, respList) {
 }
 
 function handlePromiseList(list) {
+    // 响应集合
     const respList = [];
+    // 排除掉 null
     const validList = list.filter(item => item != null);
+    // 执行 task，返回 promise list
     const handledList = validList.map((item) => handleTask(item, respList));
+    // promise 全部执行完毕后，返回响应集合
     return Promise.all(handledList).then(() => {
         return respList;
     });

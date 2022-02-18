@@ -1,3 +1,4 @@
+// ${module}${feature}${errtype}
 module.exports = {
     DB: {
         CONNECT_EXCEPTION: {

@@ -2,18 +2,16 @@ const express = require('express');
 const router = express.Router();
 const indexSQL = require('../sql');
 const utilsHelper = require('../utils/utils');
-const transactionUtils = require('../utils/transaction');
 const errcode = require('../utils/errcode');
+const dbUtils = require('../utils/db');
 
 /**
  * @param {Number} count 查询数量
  * @description 根据传入的count获取阅读排行top N的文章
  */
 router.get('/top_read', function (req, res, next) {
-    const connection = req.connection;
     const params = req.query;
-    connection.query(indexSQL.GetTopRead, [Number(params.count)], function (error, results, fileds) {
-        connection.release();
+    dbUtils.query({ sql: indexSQL.GetTopRead, values: [Number(params.count)] }).then(({ results }) => {
         if (results) {
             res.send({
                 code: '0',
@@ -25,7 +23,7 @@ router.get('/top_read', function (req, res, next) {
                 data: []
             });
         }
-    });
+    })
 });
 
 /**
@@ -34,11 +32,9 @@ router.get('/top_read', function (req, res, next) {
  * @description 分页查询文章
  */
 router.get('/page', function (req, res, next) {
-    const connection = req.connection;
     const pageNo = Number(req.query.pageNo || 1);
     const pageSize = Number(req.query.pageSize || 10);
-    connection.query(indexSQL.GetPagedArticle, [(pageNo - 1) * pageSize, pageSize], function (error, results, fileds) {
-        connection.release();
+    dbUtils.query({ sql: indexSQL.GetPagedArticle, values: [(pageNo - 1) * pageSize, pageSize] }).then(({ results }) => {
         if (results) {
             results[0].forEach(handleCategoryAndTag)
             res.send({
@@ -52,19 +48,17 @@ router.get('/page', function (req, res, next) {
                 data: []
             });
         }
-    });
+    })
 });
 
 /**
  * @description 分页查询
  */
 router.get('/page_admin', function (req, res, next) {
-    const connection = req.connection;
-    const param = req.query;
-    const pageNo = Number(param.pageNo || 1);
-    const pageSize = Number(param.pageSize || 10)
-    connection.query(indexSQL.GetArticlePageAdmin, [(pageNo - 1) * pageSize, pageSize], function (error, results, fileds) {
-        connection.release();
+    const params = req.query;
+    const pageNo = Number(params.pageNo || 1);
+    const pageSize = Number(params.pageSize || 10)
+    dbUtils.query({ sql: indexSQL.GetArticlePageAdmin, values: [(pageNo - 1) * pageSize, pageSize] }).then(({ results }) => {
         if (results) {
             // 查询成功
             results[0].forEach(handleCategoryAndTag)
@@ -80,7 +74,7 @@ router.get('/page_admin', function (req, res, next) {
                 data: 0
             });
         }
-    });
+    })
 });
 
 /**
@@ -88,10 +82,8 @@ router.get('/page_admin', function (req, res, next) {
  * @description 查询上一篇和下一篇文章的id
  */
 router.get('/neighbors', function (req, res, next) {
-    const connection = req.connection;
     const id = Number(req.query.id);
-    connection.query(indexSQL.QueryPreAndNextArticleIds, [id, id], function (error, results, fileds) {
-        connection.release();
+    dbUtils.query({ sql: indexSQL.QueryPreAndNextArticleIds, values: [id, id] }).then(({ results }) => {
         if (results) {
             res.send({
                 code: '0',
@@ -103,7 +95,7 @@ router.get('/neighbors', function (req, res, next) {
                 data: []
             });
         }
-    });
+    })
 });
 
 /**
@@ -111,9 +103,7 @@ router.get('/neighbors', function (req, res, next) {
  * @description 上报阅读记录
  */
 router.put('/update_read_num', function (req, res, next) {
-    const connection = req.connection;
-    connection.query(indexSQL.UpdateReadSum, [req.body.id], function (error, results, fileds) {
-        connection.release();
+    dbUtils.query({ sql: indexSQL.UpdateReadSum, values: [req.body.id] }).then(({ results }) => {
         if (results) {
             res.send({
                 code: '0'
@@ -131,17 +121,15 @@ router.put('/update_read_num', function (req, res, next) {
  * @description 修改私密/公开
  */
 router.put('/update_private', function (req, res, next) {
-    const connection = req.connection;
     const params = req.body;
-    connection.query(indexSQL.UpdateArticlePrivate, [params.private, params.id], function (error, results, fileds) {
-        connection.release();
+    dbUtils.query({ sql: indexSQL.UpdateArticlePrivate, values: [params.private, params.id] }).then(({ results }) => {
         if (results) {
             res.send({
                 code: '0'
             });
         } else {
             res.send({
-                code: '008001'
+                code: '008002'
             });
         }
     })
@@ -152,10 +140,8 @@ router.put('/update_private', function (req, res, next) {
  * @description 逻辑删除/恢复
  */
 router.put('/update_deleted', function (req, res, next) {
-    const connection = req.connection;
     const params = req.body;
-    connection.query(indexSQL.UpdateArticleDeleted, [params.deleted, params.id], function (error, results, fileds) {
-        connection.release();
+    dbUtils.query({ sql: indexSQL.UpdateArticleDeleted, values: [params.deleted, params.id] }).then(({ results }) => {
         if (results) {
             res.send({
                 code: '0'
@@ -173,10 +159,8 @@ router.put('/update_deleted', function (req, res, next) {
  * @description 物理删除
  */
 router.delete('/delete', function (req, res, next) {
-    const connection = req.connection;
     const params = req.query;
-    connection.query(indexSQL.DeleteArticleById, [params.id], function (error, results, fileds) {
-        connection.release();
+    dbUtils.query({ sql: indexSQL.DeleteArticleById, values: [params.id] }).then(({ results }) => {
         if (results) {
             res.send({
                 code: '0'
@@ -194,10 +178,8 @@ router.delete('/delete', function (req, res, next) {
  * @description 获得文章详情
  */
 router.get('/detail', function (req, res, next) {
-    const connection = req.connection;
     const params = req.query;
-    connection.query(indexSQL.GetArticleByID, [Number(params.id)], function (error, results, fileds) {
-        connection.release();
+    dbUtils.query({ sql: indexSQL.GetArticleByID, values: [Number(params.id)] }).then(({ results }) => {
         if (results && results.length > 0) {
             const data = results[0];
             if (data.private) {
@@ -227,7 +209,7 @@ router.get('/detail', function (req, res, next) {
                 data: null
             });
         }
-    });
+    })
 });
 
 /**
@@ -235,11 +217,9 @@ router.get('/detail', function (req, res, next) {
  * @description 根据分类名查询文章
  */
 router.get('/page_by_category', function (req, res, next) {
-    const connection = req.connection;
     const pageNo = Number(req.query.pageNo || 1);
     const pageSize = Number(req.query.pageSize || 10);
-    connection.query(indexSQL.GetPagedArticleByCategory, [req.query.keyword, (pageNo - 1) * pageSize, pageSize, req.query.keyword], function (error, results, fileds) {
-        connection.release();
+    dbUtils.query({ sql: indexSQL.GetPagedArticleByCategory, values: [req.query.keyword, (pageNo - 1) * pageSize, pageSize, req.query.keyword] }).then(({ results }) => {
         if (results) {
             results[0].forEach(handleCategoryAndTag)
             res.send({
@@ -261,11 +241,9 @@ router.get('/page_by_category', function (req, res, next) {
  * @description 根据标签名查询文章
  */
 router.get('/page_by_tag', function (req, res, next) {
-    const connection = req.connection;
     const pageNo = Number(req.query.pageNo || 1);
     const pageSize = Number(req.query.pageSize || 10);
-    connection.query(indexSQL.GetPagedArticleByTag, [req.query.keyword, (pageNo - 1) * pageSize, pageSize], function (error, results, fileds) {
-        connection.release();
+    dbUtils.query({ sql: indexSQL.GetPagedArticleByTag, values: [req.query.keyword, (pageNo - 1) * pageSize, pageSize] }).then(({ results }) => {
         if (results) {
             results[0].forEach(handleCategoryAndTag)
             res.send({
@@ -286,195 +264,90 @@ router.get('/page_by_tag', function (req, res, next) {
  * @description 发表文章
  */
 router.post('/add', function (req, res, next) {
-    const connection = req.connection;
-    const param = req.body;
-    let articleId;
-    let newCategoryIds = [];
-    let tagIds = [];
-    const allTaskList = [
-        {
-            // 任务1：插入文章表
-            task: function () {
-                return new Promise((resolve, reject) => {
-                    connection.query(indexSQL.PublishArticle, [param.articleTitle, param.articleText, param.summary, new Date(), param.authorId, param.poster], function (error, results, fileds) {
-                        if (error) {
-                            reject(error);
-                        } else {
-                            articleId = results.insertId;
-                            resolve(results);
-                        }
-                    });
-                });
-            },
-            children: [
-                param.newCategories ? {
-                    // 任务1-2：如果存在新的分类，插入分类表
-                    task: function () {
-                        return new Promise((resolve, reject) => {
-                            let addCategoryTaskList = []
+    dbUtils.getConnection(res).then(connection => {
+        const params = req.body;
+        let articleId;
+        let newCategoryIds = [];
+        let tagIDs = [];
+        const allTaskList = [
+            {
+                // 任务1：插入文章表
+                task: function () {
+                    return dbUtils.query({ sql: indexSQL.PublishArticle, values: [params.articleTitle, params.articleText, params.summary, new Date(), params.authorId, params.poster] }, connection, false).then(({ results }) => {
+                        articleId = results.insertId;
+                    })
+                },
+                children: [
+                    params.newCategories ? {
+                        // 任务1-2：如果存在新的分类，插入分类表
+                        task: function () {
+                            const addCategoryTaskList = params.newCategories.map(item => dbUtils.query({ sql: indexSQL.AddCategories, values: [item] }, connection, false))
                             // 循环插入
-                            param.newCategories.forEach(item => {
-                                let promiseAddCategory = new Promise((resolveChild, rejectChild) => {
-                                    connection.query(indexSQL.AddCategories, [item], function (error, results, fileds) {
-                                        if (error) {
-                                            connection.rollback(function () {
-                                                rejectChild(error)
-                                            })
-                                        } else {
-                                            resolveChild(results)
-                                        }
-                                    })
-                                })
-                                addCategoryTaskList.push(promiseAddCategory)
+                            return Promise.all(addCategoryTaskList).then(ress => {
+                                newCategoryIds = ress.map(res => res.results.insertId)
                             })
-                            return Promise.all(addCategoryTaskList).then(resp => {
-                                newCategoryIds = resp.map(item => item.insertId)
-                                resolve()
-                            }, failure => {
-                                reject()
-                            })
-                        })
-                    },
-                    children: [
-                        {
-                            // 任务1-2-1：插入文章分类关系表
-                            task: function () {
-                                return new Promise((resolve, reject) => {
-                                    let addArticleCategoryTaskList = []
-                                    // 循环插入
-                                    newCategoryIds.forEach(item => {
-                                        let promiseAddArticleCategory = new Promise((resolveChild, rejectChild) => {
-                                            connection.query(indexSQL.AddArticleCategory, [articleId, item], function (error, results, fileds) {
-                                                if (error) {
-                                                    connection.rollback(function () {
-                                                        rejectChild(error)
-                                                    })
-                                                } else {
-                                                    resolveChild(results)
-                                                }
-                                            })
-                                        })
-                                        addArticleCategoryTaskList.push(promiseAddArticleCategory)
-                                    })
-                                    return Promise.all(addArticleCategoryTaskList).then(resp => {
-                                        resolve()
-                                    }, failure => {
-                                        reject()
-                                    })
-                                })
+                        },
+                        children: [
+                            {
+                                // 任务1-2-1：插入文章分类关系表
+                                task: function () {
+                                    const addArticleCategoryTaskList = newCategoryIds.map(item => dbUtils.query({ sql: indexSQL.AddArticleCategory, values: [articleId, item] }, connection, false))
+                                    return Promise.all(addArticleCategoryTaskList)
+                                }
                             }
+                        ]
+                    } : null,
+                    params.oldCategoryIds ? {
+                        // 任务1-3：如果选择了旧的分类，插入文章分类关系表
+                        task: function () {
+                            const addArticleCategoryTaskList = params.oldCategoryIds.map(item => dbUtils.query({ sql: indexSQL.AddArticleCategory, values: [articleId, item] }, connection, false))
+                            return Promise.all(addArticleCategoryTaskList)
                         }
-                    ]
-                } : null,
-                param.oldCategoryIds ? {
-                    // 任务1-3：如果选择了旧的分类，插入文章分类关系表
-                    task: function () {
-                        return new Promise((resolve, reject) => {
-                            let addArticleCategoryTaskList = [];
-                            // 循环插入
-                            param.oldCategoryIds.forEach(item => {
-                                let promiseAddArticleCategory = new Promise((resolveChild, rejectChild) => {
-                                    connection.query(indexSQL.AddArticleCategory, [articleId, item], function (error, results, fileds) {
-                                        if (error) {
-                                            connection.rollback(function () {
-                                                rejectChild(error);
-                                            });
-                                        } else {
-                                            resolveChild(results);
-                                        }
+                    } : null,
+                    {
+                        // 任务1-4：插入标签表和关系表
+                        task: function () {
+                            const addTagTaskList = params.tags.map(item => dbUtils.query({ sql: indexSQL.CheckTag, values: [item] }, connection, false).then(({ results }) => {
+                                if (results.length == 0) {
+                                    // 不存在，插入标签
+                                    return dbUtils.query({ sql: indexSQL.AddTags, values: [item] }, connection, false).then(({ results }) => {
+                                        return results
                                     })
-                                })
-                                addArticleCategoryTaskList.push(promiseAddArticleCategory);
-                            })
-                            return Promise.all(addArticleCategoryTaskList).then(resp => {
-                                resolve();
-                            }, failure => {
-                                reject();
-                            })
-                        })
-                    }
-                } : null,
-                {
-                    // 任务1-4：插入标签表和关系表
-                    task: function () {
-                        return new Promise((resolve, reject) => {
-                            let addTagTaskList = [];
-                            // 循环插入
-                            param.tags.forEach(item => {
-                                let promiseAddTag = new Promise((resolveChild, rejectChild) => {
-                                    // 插入前先检查标签是不是存在了，存在的话，直接取得其ID
-                                    connection.query(indexSQL.CheckTag, [item], function (error, results, fileds) {
-                                        if (results.length == 0) {
-                                            // 不存在，插入标签
-                                            connection.query(indexSQL.AddTags, [item], function (error, results2, fileds) {
-                                                if (error) {
-                                                    rejectChild(error);
-                                                } else {
-                                                    resolveChild(results2);
-                                                }
-                                            });
-                                        } else {
-                                            // 存在，取得标签ID
-                                            resolveChild({ insertId: results[0].id });
-                                        }
-                                    })
-                                });
-                                addTagTaskList.push(promiseAddTag);
-                            })
-                            return Promise.all(addTagTaskList).then(resp => {
-                                tagIds = resp.map(item => item.insertId)
-                                resolve();
-                            }, failure => {
-                                reject();
+                                } else {
+                                    // 存在，取得标签ID
+                                    return { insertId: results[0].id }
+                                }
+                            }))
+                            return Promise.all(addTagTaskList).then(ress => {
+                                tagIDs = ress.map(res => res.insertId)
                             });
-                        });
-                    },
-                    children: [
-                        {
-                            // 任务1-4-1：插入文章标签关系表
-                            task: function () {
-                                return new Promise((resolve, reject) => {
-                                    let addArticleTagTaskList = [];
-                                    // 循环插入
-                                    tagIds.forEach(item => {
-                                        let promiseAddTagCategory = new Promise((resolveChild, rejectChild) => {
-                                            connection.query(indexSQL.AddArticleTag, [articleId, item], function (error, results, fileds) {
-                                                if (error) {
-                                                    rejectChild(error);
-                                                } else {
-                                                    resolveChild(results);
-                                                }
-                                            });
-                                        });
-                                        addArticleTagTaskList.push(promiseAddTagCategory);
-                                    })
-                                    return Promise.all(addArticleTagTaskList).then(resp => {
-                                        resolve()
-                                    }, failure => {
-                                        reject()
-                                    })
-                                })
+                        },
+                        children: [
+                            {
+                                // 任务1-4-1：插入文章标签关系表
+                                task: function () {
+                                    const addArticleTagTaskList = tagIDs.map(item => dbUtils.query({ sql: indexSQL.AddArticleTag, values: [articleId, item] }, connection, false))
+                                    return Promise.all(addArticleTagTaskList)
+                                }
                             }
-                        }
-                    ]
-                }
-            ]
-        }
-    ];
-    const handledTaskList = utilsHelper.handlePromiseList(allTaskList);
-    transactionUtils.doTransaction(connection, handledTaskList).then(allResp => {
-        connection.release();
-        res.send({
-            code: allResp ? '0' : '002001'
+                        ]
+                    }
+                ]
+            }
+        ];
+        const handledTaskList = utilsHelper.handlePromiseList(allTaskList);
+        dbUtils.execTransaction(connection, handledTaskList).then(ress => {
+            res.send({
+                code: '0'
+            });
+        }, err => {
+            // 插入失败
+            res.send({
+                code: '002001',
+                msg: "发布失败"
+            });
         });
-    }, failure => {
-        connection.release();
-        // 插入失败
-        res.send({
-            code: '002001',
-            msg: "发布失败"
-        });
-    });
+    })
 });
 
 /**
@@ -489,255 +362,117 @@ router.post('/add', function (req, res, next) {
  */
 
 router.put('/update', function (req, res, next) {
-    const connection = req.connection;
-    const param = req.body;
-    let tagIDs = [];
-    let categoryIDs = [];
-    const allTaskList = [
-        {
-            // 任务1
-            task: function () {
-                return new Promise((resolve, reject) => {
+    dbUtils.getConnection(res).then(connection => {
+        const params = req.body;
+        let tagIDs = [];
+        let categoryIDs = [];
+        const allTaskList = [
+            {
+                // 任务1
+                task: function () {
                     const updateArticleParam = {
-                        article_name: param.articleTitle,
+                        article_name: params.articleTitle,
                         // XSS防护
-                        article_text: param.articleText,
-                        poster: param.poster,
-                        summary: param.summary,
-                        private: param.private,
+                        article_text: params.articleText,
+                        poster: params.poster,
+                        summary: params.summary,
+                        private: params.private,
                         update_time: new Date()
                     }
-                    connection.query(indexSQL.UpdateArticle, [updateArticleParam, param.id], function (error, results, fileds) {
-                        if (error) {
-                            reject(error);
+                    return dbUtils.query({ sql: indexSQL.UpdateArticle, values: [updateArticleParam, params.id] }, connection, false)
+                }
+            },
+            params.deleteTagIDs ? {
+                // 任务2
+                task: function () {
+                    const deleteArticleTagTaskList = params.deleteTagIDs.map(item => dbUtils.query({ sql: indexSQL.DeleteArticleTag, values: [params.id, item] }, connection, false))
+                    return Promise.all(deleteArticleTagTaskList)
+                }
+            } : null,
+            params.newTags ? {
+                // 任务3
+                task: function () {
+                    const addTagTaskList = params.newTags.map(item => dbUtils.query({ sql: indexSQL.CheckTag, values: [item] }, connection, false).then(({ results }) => {
+                        if (results.length == 0) {
+                            // 不存在，插入标签
+                            return dbUtils.query({ sql: indexSQL.AddTags, values: [item] }, connection, false).then(({ results }) => {
+                                return results
+                            })
                         } else {
-                            resolve(results);
+                            // 存在，取得标签ID
+                            return { insertId: results[0].id }
                         }
+                    }))
+                    return Promise.all(addTagTaskList).then(ress => {
+                        tagIDs = ress.map(res => res.insertId)
                     });
-                });
-            }
-        },
-        param.deleteTagIDs ? {
-            // 任务2
-            task: function () {
-                return new Promise((resolve, reject) => {
-                    let deleteArticleTagTaskList = [];
-                    // 循环插入
-                    param.deleteTagIDs.forEach(tagid => {
-                        let promiseDeleteArticleTag = new Promise((resolveChild, rejectChild) => {
-                            connection.query(indexSQL.DeleteArticleTag, [param.id, tagid], function (error, results, fileds) {
-                                if (error) {
-                                    rejectChild(error);
-                                } else {
-                                    resolveChild(results);
-                                }
-                            });
-                        });
-                        deleteArticleTagTaskList.push(promiseDeleteArticleTag);
-                    })
-                    return Promise.all(deleteArticleTagTaskList).then(resp => {
-                        resolve()
-                    }, failure => {
-                        reject()
-                    });
-                });
-            }
-        } : null,
-        param.newTags ? {
-            // 任务3
-            task: function () {
-                return new Promise((resolve, reject) => {
-                    let addTagTaskList = [];
-                    // 循环插入
-                    param.newTags.forEach(item => {
-                        let promiseAddTag = new Promise((resolveChild, rejectChild) => {
-                            // 插入前先检查标签是不是存在了，存在的话，直接取得其ID
-                            connection.query(indexSQL.CheckTag, [item], function (error, results, fileds) {
-                                if (results.length == 0) {
-                                    // 不存在，插入标签
-                                    connection.query(indexSQL.AddTags, [item], function (error, results2, fileds) {
-                                        if (error) {
-                                            rejectChild(error);
-                                        } else {
-                                            resolveChild(results2);
-                                        }
-                                    });
-                                } else {
-                                    // 存在，取得标签ID
-                                    resolveChild({ insertId: results[0].id });
-                                }
-                            })
-                        });
-                        addTagTaskList.push(promiseAddTag);
-                    })
-                    return Promise.all(addTagTaskList).then(resp => {
-                        tagIDs = resp.map(item => item.insertId)
-                        resolve();
-                    }, failure => {
-                        reject();
-                    });
-                });
-            },
-            children: [
-                {
-                    // 任务3-1：插入文章标签关系表
-                    task: function () {
-                        return new Promise((resolve, reject) => {
-                            let addArticleTagTaskList = [];
-                            // 循环插入
-                            tagIDs.forEach(item => {
-                                let promiseAddArticleTag = new Promise((resolveChild, rejectChild) => {
-                                    connection.query(indexSQL.AddArticleTag, [param.id, item], function (error, results, fileds) {
-                                        if (error) {
-                                            rejectChild(error);
-                                        } else {
-                                            resolveChild(results);
-                                        }
-                                    });
-                                });
-                                addArticleTagTaskList.push(promiseAddArticleTag);
-                            })
-                            return Promise.all(addArticleTagTaskList).then(resp => {
-                                resolve()
-                            }, failure => {
-                                reject()
-                            })
-                        })
+                },
+                children: [
+                    {
+                        // 任务3-1：插入文章标签关系表
+                        task: function () {
+                            const addArticleTagTaskList = tagIDs.map(item => dbUtils.query({ sql: indexSQL.AddArticleTag, values: [params.id, item] }, connection, false))
+                            return Promise.all(addArticleTagTaskList)
+                        }
                     }
+                ]
+            } : null,
+            params.deleteCategoryIDs ? {
+                // 任务4
+                task: function () {
+                    const deleteArticleCategoryTaskList = params.deleteCategoryIDs.map(item => dbUtils.query({ sql: indexSQL.DeleteArticleCategory, values: [params.id, item] }, connection, false))
+                    return Promise.all(deleteArticleCategoryTaskList)
                 }
-            ]
-        } : null,
-        param.deleteCategoryIDs ? {
-            // 任务4
-            task: function () {
-                return new Promise((resolve, reject) => {
-                    let deleteArticleCategoryTaskList = [];
-                    // 循环插入
-                    param.deleteCategoryIDs.forEach(categoryid => {
-                        let promiseDeleteArticleCategory = new Promise((resolveChild, rejectChild) => {
-                            connection.query(indexSQL.DeleteArticleCategory, [param.id, categoryid], function (error, results, fileds) {
-                                if (error) {
-                                    rejectChild(error);
-                                } else {
-                                    resolveChild(results);
-                                }
-                            });
-                        });
-                        deleteArticleCategoryTaskList.push(promiseDeleteArticleCategory);
-                    })
-                    return Promise.all(deleteArticleCategoryTaskList).then(resp => {
-                        resolve()
-                    }, failure => {
-                        reject()
+            } : null,
+            params.newCategories ? {
+                // 任务5
+                task: function () {
+                    const addCategoryTaskList = params.tags.map(item => dbUtils.query({ sql: indexSQL.CheckCategory, values: [item] }, connection, false).then(({ results }) => {
+                        if (results.length == 0) {
+                            // 不存在，插入分类
+                            return dbUtils.query({ sql: indexSQL.AddCategories, values: [item] }, connection, false).then(({ results }) => {
+                                return results
+                            })
+                        } else {
+                            // 存在，取得分类ID
+                            return { insertId: results[0].id }
+                        }
+                    }))
+                    return Promise.all(addCategoryTaskList).then(ress => {
+                        categoryIDs = ress.map(res => res.insertId)
                     });
-                });
-            }
-        } : null,
-        param.newCategories ? {
-            // 任务5
-            task: function () {
-                return new Promise((resolve, reject) => {
-                    let addCategoryTaskList = [];
-                    // 循环插入
-                    param.newCategories.forEach(item => {
-                        let promiseAddCategory = new Promise((resolveChild, rejectChild) => {
-                            // 插入前先检查分类是不是存在了，存在的话，直接取得其ID
-                            connection.query(indexSQL.CheckCategory, [item], function (error, results, fileds) {
-                                if (results.length == 0) {
-                                    // 不存在，插入分类
-                                    connection.query(indexSQL.AddCategories, [item], function (error, results2, fileds) {
-                                        if (error) {
-                                            rejectChild(error);
-                                        } else {
-                                            resolveChild(results2);
-                                        }
-                                    });
-                                } else {
-                                    // 存在，取得分类ID
-                                    resolveChild({ insertId: results[0].id });
-                                }
-                            })
-                        });
-                        addCategoryTaskList.push(promiseAddCategory);
-                    })
-                    return Promise.all(addCategoryTaskList).then(resp => {
-                        categoryIDs = resp.map(item => item.insertId)
-                        resolve();
-                    }, failure => {
-                        reject();
-                    });
-                });
-            },
-            children: [
-                {
-                    // 任务5-1：插入文章分类关系表
-                    task: function () {
-                        return new Promise((resolve, reject) => {
-                            let addArticleCategoryTaskList = [];
-                            // 循环插入
-                            categoryIDs.forEach(item => {
-                                let promiseAddArticleCategory = new Promise((resolveChild, rejectChild) => {
-                                    connection.query(indexSQL.AddArticleCategory, [param.id, item], function (error, results, fileds) {
-                                        if (error) {
-                                            rejectChild(error);
-                                        } else {
-                                            resolveChild(results);
-                                        }
-                                    });
-                                });
-                                addArticleCategoryTaskList.push(promiseAddArticleCategory);
-                            })
-                            return Promise.all(addArticleCategoryTaskList).then(resp => {
-                                resolve()
-                            }, failure => {
-                                reject()
-                            })
-                        })
+                },
+                children: [
+                    {
+                        // 任务5-1：插入文章分类关系表
+                        task: function () {
+                            const addArticleCategoryTaskList = categoryIDs.map(item => dbUtils.query({ sql: indexSQL.AddArticleCategory, values: [params.id, item] }, connection, false))
+                            return Promise.all(addArticleCategoryTaskList)
+                        }
                     }
+                ]
+            } : null,
+            params.relatedCategoryIDs ? {
+                // 任务6
+                task: function () {
+                    const relateTaskList = params.relatedCategoryIDs.map(item => dbUtils.query({ sql: indexSQL.AddArticleCategory, values: [params.id, item] }, connection, false))
+                    return Promise.all(relateTaskList)
                 }
-            ]
-        } : null,
-        param.relatedCategoryIDs ? {
-            // 任务6
-            task: function () {
-                return new Promise((resolve, reject) => {
-                    let relateTaskList = [];
-                    // 循环插入
-                    param.relatedCategoryIDs.forEach(categoryid => {
-                        let promiseRelate = new Promise((resolveChild, rejectChild) => {
-                            connection.query(indexSQL.AddArticleCategory, [param.id, categoryid], function (error, results, fileds) {
-                                if (error) {
-                                    rejectChild(error);
-                                } else {
-                                    resolveChild(results);
-                                }
-                            });
-                        });
-                        relateTaskList.push(promiseRelate);
-                    })
-                    return Promise.all(relateTaskList).then(resp => {
-                        resolve()
-                    }, failure => {
-                        reject()
-                    });
-                });
-            }
-        } : null
-    ];
-    const handledTaskList = utilsHelper.handlePromiseList(allTaskList);
-    transactionUtils.doTransaction(connection, handledTaskList).then(allResp => {
-        connection.release();
-        res.send({
-            code: allResp ? '0' : '002001'
+            } : null
+        ];
+        const handledTaskList = utilsHelper.handlePromiseList(allTaskList);
+        dbUtils.execTransaction(connection, handledTaskList).then(ress => {
+            res.send({
+                code: '0'
+            });
+        }, err => {
+            // 插入失败
+            res.send({
+                code: '002001',
+                msg: "更新失败"
+            });
         });
-    }, failure => {
-        connection.release();
-        // 插入失败
-        res.send({
-            code: '002001',
-            msg: "更新失败"
-        });
-    });
+    })
 });
 
 
