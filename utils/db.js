@@ -1,9 +1,9 @@
 /*
- * @Author: 蒋文斌
+ * @Author: Tusi
  * @Date: 2019-04-09 16:05:13
- * @LastEditors: 蒋文斌
+ * @LastEditors: Tusi
  * @LastEditTime: 2021-05-27 09:24:43
- * @Description: 自动生成
+ * @Description: db helpers
  */
 const mysql = require("mysql");
 const config = require("../config");
