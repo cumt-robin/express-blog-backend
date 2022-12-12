@@ -14,5 +14,8 @@ module.exports = {
     authorEmail: 'your private email which is used for receiving notifications',
     blogName: 'your blog name, such as Tusi博客',
     cookieExpireDate: 3,
-    siteURL: 'visit url of your blog, such as https://blog.me'
+    siteURL: 'visit url of your blog, such as https://blog.me',
+    chatgpt: {
+        key: 'your OPENAI_API_KEY'
+    }
 }
