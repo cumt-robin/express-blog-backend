@@ -273,7 +273,7 @@ router.post('/add', function (req, res, next) {
             {
                 // 任务1：插入文章表
                 task: function () {
-                    return dbUtils.query({ sql: indexSQL.PublishArticle, values: [params.articleTitle, params.articleText, params.summary, new Date(), params.authorId, params.poster] }, connection, false).then(({ results }) => {
+                    return dbUtils.query({ sql: indexSQL.PublishArticle, values: [params.articleTitle, params.articleText, params.summary, params.authorId, params.poster] }, connection, false).then(({ results }) => {
                         articleId = results.insertId;
                     })
                 },
