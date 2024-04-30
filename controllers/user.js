@@ -1,4 +1,5 @@
 const express = require('express');
+const jwt = require('jsonwebtoken');
 const router = express.Router();
 const indexSQL = require('../sql');
 const emailHandler = require('../utils/email');
@@ -27,21 +28,31 @@ router.put('/login', function (req, res, next) {
 		dbUtils.getConnection(res).then(connection => {
 			dbUtils.query({ sql: indexSQL.QueryByUserNameAndPwd, values: [params.userName, params.password] }, connection, false).then(({ results }) => {
 				if (results.length > 0) {
-					// 更新登录时间和token
-					return dbUtils.query({ sql: indexSQL.UpdateUserById, values: [{ last_login_time: new Date(), token: req.session.id }, results[0].id] }, connection, false).then(() => {
-						// 设置过期时间，来源于配置
-						const expireTime = new Date(Date.now() + 86400000 * config.cookieExpireDate);
-						// 127.0.0.1或localhost是无法Set-Cookie的
-						res.cookie('username', params.userName, { expires: expireTime, httpOnly: true, sameSite: 'lax', secure: true });
-						// islogined 是给前端做路由守卫的一个判断标志位，不作为后端验证的依据
-						res.cookie('islogined', 1, { expires: expireTime });
-						// token 是后端校验依据，需要严格安全
-						res.cookie('token', req.session.id, { expires: expireTime, httpOnly: true, sameSite: 'lax', secure: true });
-						res.send({
-							code: '0',
-							data: results[0]
-						});
-					})
+					const user = results[0];
+					const signResult = jwt.sign(
+						{
+							id: user.id,
+							userName: user.user_name,
+							roleId: user.role_id,
+							roleName: user.role_name
+						},
+						config.jwt.secret,
+						{
+							expiresIn: `${config.jwt.expireDays}d`
+						}
+					)
+					// 更新登录时间
+					dbUtils.query({
+						sql: indexSQL.UpdateUserById,
+						values: [{ last_login_time: new Date() }, user.id]
+					}, connection, false)
+					res.send({
+						code: '0',
+						data: {
+							...results[0],
+							token: signResult
+						}
+					});
 				} else {
 					res.send({
 						code: '001003',
@@ -60,9 +71,6 @@ router.put('/login', function (req, res, next) {
  * @description 退出登录
  */
 router.put('/logout', function (req, res, next) {
-	res.clearCookie('username');
-	res.clearCookie('islogined');
-	res.clearCookie('token');
 	res.send({
 		code: '0'
 	});

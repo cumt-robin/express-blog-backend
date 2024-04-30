@@ -21,8 +21,7 @@ module.exports = {
                 NODE_ENV: 'production',
                 PORT: 8002,
             },
-            watch: true,
-            ignore_watch: ["node_modules"]
+            ignore_watch: ["node_modules", ".git"]
         }
     ],
     /**

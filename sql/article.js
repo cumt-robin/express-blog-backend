@@ -27,8 +27,8 @@ module.exports = {
         LEFT JOIN category c ON a_c.category_id = c.id\
         LEFT JOIN article_tag a_t ON a.id = a_t.article_id\
         LEFT JOIN tag t ON a_t.tag_id = t.id\
-        GROUP BY a.id\
-        having a.id = ?',
+        WHERE a.id = ?\
+        GROUP BY a.id',
     // 通过标签名分页查询标签下的文章，并通过左连接查询出文章的相关分类与标签
     GetPagedArticleByTag: 'SELECT SQL_CALC_FOUND_ROWS a.id, a.article_name, a.poster, a.read_num, a.summary, a.create_time, a.update_time, u.nick_name AS author, GROUP_CONCAT(DISTINCT c.id SEPARATOR " ") AS categoryIDs, GROUP_CONCAT(DISTINCT c.category_name SEPARATOR " ") AS categoryNames, GROUP_CONCAT(DISTINCT t.id SEPARATOR " ") AS tagIDs, GROUP_CONCAT(DISTINCT t.tag_name SEPARATOR " ") AS tagNames FROM article a\
         LEFT JOIN user u ON a.author_id = u.id\
