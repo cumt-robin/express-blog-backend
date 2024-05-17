@@ -6,14 +6,12 @@ const cookieParser = require('cookie-parser');
 const session = require('express-session');
 const helmet = require('helmet')
 // const compression = require('compression');
-
 const routeMiddleware = require('./routes/index');
-const ws = require('./utils/ws');
+const { startWs } = require('./utils/ws');
 
 const app = express();
 
 const server = http.createServer(app);
-const io = require('socket.io')(server);
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
@@ -51,7 +49,7 @@ server.listen(app.get('port'), function() {
 });
 
 // socket io
-ws.init(io);
+startWs(server)
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {

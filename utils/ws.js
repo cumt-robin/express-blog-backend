@@ -1,18 +1,15 @@
 const fs = require('fs');
+const socketIo = require('socket.io')
 
-function init(io) {
-    // bloggerOnlineHandler(io);
-    chatRoomHandler(io);
-    // videoStreamHandler(io)
-}
+let io
 
-// function bloggerOnlineHandler(io) {
+// function bloggerOnlineHandler() {
 //     io.of('online').on('connection', function (socket) {
         
 //     });
 // }
 
-function chatRoomHandler(io) {
+function chatRoomHandler() {
     io.of('chatroom').on('connection', function (socket) {
         sendToSingle(socket, {
             event: 'greet_from_server',
@@ -46,7 +43,7 @@ function chatRoomHandler(io) {
     });
 }
 
-function videoStreamHandler(io) {
+function videoStreamHandler() {
     io.of('videostream').on('connection', function (socket) {
         let filePath = 'public/videos/frag_bunny.mp4'
         const dataBuffer = ''
@@ -85,7 +82,7 @@ function sendToSingle(socket, param) {
     socket.emit('singleMsg', param);
 }
 
-function broadcastAll(io, param) {
+function broadcastAll(param) {
     io.emit('broadcastAll', param)
 }
 
@@ -93,4 +90,9 @@ function broadcastExceptSelf(socket, param) {
     socket.broadcast.emit('broadcast', param);
 }
 
-module.exports.init = init;
+function startWs(server) {
+    io = socketIo(server);
+    chatRoomHandler();
+}
+
+module.exports.startWs = startWs;
