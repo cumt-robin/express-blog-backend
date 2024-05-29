@@ -1,10 +1,12 @@
-Hello，这是[Vue3+TS+Node打造个人博客](https://juejin.cn/post/7066966456638013477)开源项目的后端部分，采用 Nodejs 实现，应用框架是 Express。
+Hello，这是[Vue3+TS+Node打造个人博客](https://juejin.cn/column/7177402980180688952)开源全栈项目的后端部分，采用 Nodejs 实现，应用框架是 Express。
 
 如果您需要找到前端源码，可以打开[vue3-ts-blog-frontend](https://github.com/cumt-robin/vue3-ts-blog-frontend)。
 
+如果您需要找到小程序源码，可以打开[blog-weapp](https://github.com/cumt-robin/blog-weapp)。
+
 ## 相关博客
 
-我写了一系列博客专栏，介绍如何使用 Vue3+TS+Node 打造个人博客。[点击前往专栏]([Vue3+TS+Node打造个人博客](https://juejin.cn/post/7066966456638013477))。
+我写了一系列博客专栏，介绍如何使用 Vue3+TS+Node 打造个人博客。[点击前往专栏](https://juejin.cn/column/7177402980180688952)。
 
 ## 了解后端架构
 
