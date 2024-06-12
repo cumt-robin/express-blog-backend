@@ -12,4 +12,7 @@ module.exports = {
         GROUP BY c.id',
     // 插入分类表
     AddCategories: 'INSERT ignore into category (category_name) values (?)',
+    GetCategoryAdminPage: 'SELECT SQL_CALC_FOUND_ROWS * FROM category LIMIT ?, ?;\
+        SELECT FOUND_ROWS() AS total;',
+    AdminUpdateCategory: 'UPDATE category SET ? WHERE id = ?',
 }
