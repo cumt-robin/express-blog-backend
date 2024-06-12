@@ -25,4 +25,6 @@ authMap.set('/reply/review', { role: 'admin' });
 
 authMap.set('/category/admin/page', { role: 'admin' });
 
+authMap.set('/tag/admin/page', { role: 'admin' });
+
 module.exports = authMap;

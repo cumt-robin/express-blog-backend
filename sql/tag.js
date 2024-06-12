@@ -12,5 +12,10 @@ module.exports = {
     // 插入标签表
     AddTags: 'INSERT ignore into tag (tag_name) values (?)',
     // 检查标签是否存在
-    CheckTag: 'SELECT * FROM tag WHERE tag_name = ?'
+    CheckTag: 'SELECT * FROM tag WHERE tag_name = ?',
+    GetTagAdminPage: 'SELECT SQL_CALC_FOUND_ROWS t.*, GROUP_CONCAT(a_t.article_id) AS article_ids FROM tag t\
+        LEFT JOIN article_tag a_t ON a_t.tag_id = t.id\
+        GROUP BY t.id\
+        LIMIT ?, ?;\
+        SELECT FOUND_ROWS() AS total;',
 }
