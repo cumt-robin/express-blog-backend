@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const indexSQL = require('../sql');
 const dbUtils = require('../utils/db');
+const omit = require('lodash/omit');
 
 /**
  * @param {Number} getCount 是否需要同时查出每个分类下的文章数量
@@ -53,9 +54,15 @@ router.get('/admin/page', function(req, res, next) {
     const sqlParams = [(pageNo - 1) * pageSize, pageSize]
     dbUtils.query({ sql: indexSQL.GetCategoryAdminPage, values: sqlParams }).then(({ results }) => {
         if (results) {
+            const list = results[0].map(item => {
+                return {
+                    ...omit(item, 'article_ids'),
+                    article_count: item.article_ids ? item.article_ids.split(',').length : 0
+                }
+            });
             res.send({
                 code: '0',
-                data: results[0],
+                data: list,
                 total: results[1][0]['total']
             });
         } else {
