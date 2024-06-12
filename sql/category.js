@@ -12,7 +12,10 @@ module.exports = {
         GROUP BY c.id',
     // 插入分类表
     AddCategories: 'INSERT ignore into category (category_name) values (?)',
-    GetCategoryAdminPage: 'SELECT SQL_CALC_FOUND_ROWS * FROM category LIMIT ?, ?;\
+    GetCategoryAdminPage: 'SELECT SQL_CALC_FOUND_ROWS c.*, GROUP_CONCAT(a_c.article_id) AS article_ids FROM category c\
+        LEFT JOIN article_category a_c ON a_c.category_id = c.id\
+        GROUP BY c.id\
+        LIMIT ?, ?;\
         SELECT FOUND_ROWS() AS total;',
     AdminUpdateCategory: 'UPDATE category SET ? WHERE id = ?',
 }
