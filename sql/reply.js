@@ -32,7 +32,7 @@ module.exports = {
         LEFT JOIN article a2 ON a2.id = c2.article_id\
         WHERE (r3.approved = 0 AND r3.parent_id IS NULL AND c2.article_id IS NOT NULL)',
     // 分页查询未审核的评论下的回复
-    QueryUnreviewedCommentReplyPage: 'SELECT r1.*, c1.content AS comment_content, r2.content AS reply_to_content, a1.article_name FROM reply r1\
+    QueryUnreviewedCommentReplyPage: 'SELECT SQL_CALC_FOUND_ROWS r1.*, c1.content AS comment_content, r2.content AS reply_to_content, a1.article_name FROM reply r1\
         LEFT JOIN comments c1 ON r1.comment_id = c1.id\
         LEFT JOIN article a1 ON a1.id = c1.article_id\
         JOIN reply r2 ON r1.parent_id = r2.id\

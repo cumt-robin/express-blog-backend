@@ -23,4 +23,6 @@ authMap.set('/reply/getReplyOfMsgWaitReview', { role: 'admin' });
 authMap.set('/reply/unreviewd_reply_page', { role: 'admin' });
 authMap.set('/reply/review', { role: 'admin' });
 
+authMap.set('/category/admin/page', { role: 'admin' });
+
 module.exports = authMap;

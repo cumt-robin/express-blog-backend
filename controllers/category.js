@@ -43,4 +43,54 @@ router.get('/count', function(req, res, next) {
     })
 });
 
+/**
+ * 管理员分页获取
+ */
+router.get('/admin/page', function(req, res, next) {
+    const params = req.query;
+    const pageNo = Number(params.pageNo || 1);
+    const pageSize = Number(params.pageSize || 10);
+    const sqlParams = [(pageNo - 1) * pageSize, pageSize]
+    dbUtils.query({ sql: indexSQL.GetCategoryAdminPage, values: sqlParams }).then(({ results }) => {
+        if (results) {
+            res.send({
+                code: '0',
+                data: results[0],
+                total: results[1][0]['total']
+            });
+        } else {
+            res.send({
+                code: '0007003',
+                data: []
+            });
+        }
+    })
+});
+
+/**
+ * 管理员编辑分类
+ */
+router.put('/admin/update', function (req, res, next) {
+    const { category_name, poster, id } = req.body;
+    const params = {
+        category_name,
+        poster
+    }
+    dbUtils.query({ sql: indexSQL.AdminUpdateCategory, values: [params, id] }).then(({ results }) => {
+        if (results) {
+            // 查询成功
+            res.send({
+                code: '0',
+                data: null
+            });
+        } else {
+            // 查询失败
+            res.send({
+                code: '007004',
+                data: 0
+            });
+        }
+    })
+})
+
 module.exports = router;
