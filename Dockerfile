@@ -4,7 +4,7 @@ FROM node:${NODE_VERSION}-alpine
 
 # Use production node environment by default.
 ENV NODE_ENV production
-ENV PORT 80
+ENV PORT 8080
 
 WORKDIR /app
 
@@ -24,7 +24,7 @@ USER node
 COPY . .
 
 # Expose the port that the application listens on.
-EXPOSE 80
+EXPOSE 8080
 
 # Run the application.
 CMD ["node", "app.js"]

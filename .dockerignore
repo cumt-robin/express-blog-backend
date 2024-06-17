@@ -4,6 +4,11 @@
 # For more help, visit the .dockerignore file reference guide at
 # https://docs.docker.com/go/build-context-dockerignore/
 
+config/dev.env.js
+config/env.js
+config/prod.env.js
+deploy.config.js
+
 **/.classpath
 **/.dockerignore
 **/.git
