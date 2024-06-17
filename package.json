@@ -1,6 +1,6 @@
 {
     "name": "express-blog-backend",
-    "version": "2.0.1",
+    "version": "2.1.0",
     "scripts": {
         "start": "pm2 start ecosystem.config.js --watch",
         "start-prod": "pm2 start ecosystem.config.js --env production",
