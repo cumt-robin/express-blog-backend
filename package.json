@@ -7,7 +7,7 @@
         "restart": "pm2 restart blog",
         "deploy-setup:prod": "pm2 deploy production setup",
         "deploy:prod": "pm2 deploy production",
-        "version": "conventional-changelog -p angular -i CHANGELOG.md -s && git add CHANGELOG.md"
+        "create-release": "release-it --ci"
     },
     "repository": {
         "type": "git",
@@ -38,7 +38,11 @@
         "xss": "^1.0.9"
     },
     "devDependencies": {
-        "cz-conventional-changelog": "^3.3.0"
+        "@commitlint/cli": "^13.1.0",
+        "@commitlint/config-conventional": "^13.1.0",
+        "@release-it/conventional-changelog": "7.0.2",
+        "cz-conventional-changelog": "^3.3.0",
+        "release-it": "16.3.0"
     },
     "config": {
         "commitizen": {
