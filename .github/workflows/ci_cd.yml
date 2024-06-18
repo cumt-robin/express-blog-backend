@@ -31,6 +31,17 @@ jobs:
 
           echo "$SSH_PRIVATE_KEY" > ~/.ssh/id_rsa
 
+          chmod 600 ~/.ssh/id_rsa
+
+          cat >>~/.ssh/config <<END
+          Host remote
+          HostName ${{secrets.SSH_HOST}}
+          Port 22
+          User ${{secrets.SSH_USERNAME}}
+          IdentityFile ~/.ssh/id_rsa
+          StrictHostKeyChecking no
+          END
+
           cat >>~/remote.sh <<END
           docker ps
           docker login --username=${{secrets.DOCKER_USERNAME}} --password=${{secrets.DOCKER_PASSWORD}} ${{secrets.DOCKER_REGISTRY}}
@@ -44,5 +55,5 @@ jobs:
           echo "Done"
           END
 
-          ssh $SSH_USERNAME@$SSH_HOST < ~/remote.sh
+          ssh remote < ~/remote.sh
         shell: bash
