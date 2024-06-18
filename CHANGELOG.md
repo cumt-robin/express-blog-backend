@@ -1,5 +1,7 @@
 
 
+## [2.1.3](https://github.com/cumt-robin/express-blog-backend/compare/2.1.2...2.1.3) (2024-06-18)
+
 ## [2.1.2](https://github.com/cumt-robin/express-blog-backend/compare/2.1.1...2.1.2) (2024-06-18)
 
 ## [2.1.1](https://github.com/cumt-robin/express-blog-backend/compare/2.1.0...2.1.1) (2024-06-18)
