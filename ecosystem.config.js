@@ -1,5 +1,3 @@
-const deployConfig = require("./deploy.config")
-
 module.exports = {
     /**
     * Application configuration section
@@ -17,16 +15,7 @@ module.exports = {
                 NODE_ENV: "development",
                 PORT: 8002,
             },
-            env_production: {
-                NODE_ENV: 'production',
-                PORT: 8002,
-            },
             ignore_watch: ["node_modules", ".git"]
         }
     ],
-    /**
-    * Deployment section
-    * http://pm2.keymetrics.io/docs/usage/deployment/
-    */
-    deploy: deployConfig
 };

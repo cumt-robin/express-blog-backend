@@ -1,22 +1,33 @@
-### Building and running your application
+## Docker 搭建开发环境
 
-When you're ready, start your application by running:
-`docker compose up --build`.
+参照 README.md 文件中的说明，补充好 dev.env.js, env.js 两个文件。
 
-Your application will be available at http://localhost:8002.
+1. 打镜像
 
-### Deploying your application to the cloud
+```
+docker build -f Dockerfile.dev -t blog-express .
+```
 
-First, build your image, e.g.: `docker build -t blog-express .`.
-If your cloud uses a different CPU architecture than your development
-machine (e.g., you are on a Mac M1 and your cloud provider is amd64),
-you'll want to build the image for that platform, e.g.:
-`docker build --platform=linux/amd64 -t blog-express .`.
+2. 运行容器
 
-Then, push it to your registry, e.g. `docker push myregistry.com/blog-express`.
+```
+docker run -dp 8002:8002 \
+--mount type=bind,source=./,target=/app \
+--name blog-backend \
+blog-express
+```
 
-Consult Docker's [getting started](https://docs.docker.com/go/get-started-sharing/)
-docs for more detail on building and pushing.
+## Docker 生产环境部署
 
-### References
-* [Docker's Node.js guide](https://docs.docker.com/language/nodejs/)
+登录你的服务器后，准备好两个配置文件，文件所处的位置可以自定义，分别用于挂载到 config/env.js 和 config/prod.env.js，内容参考 example 文件。
+
+```
+docker run -dp 8002:8080 \
+-v /home/robin/docker/mounts/blog-express/env.js:/app/config/env.js \
+-v /home/robin/docker/mounts/blog-express/prod.env.js:/app/config/prod.env.js \
+--name blog-backend \
+--restart always \
+registry.cn-hangzhou.aliyuncs.com/tusi_personal/blog-express:2.0.1
+```
+
+具体部署和自动化流程参考[轻松学会 Nodejs Express 项目 Docker 部署]()

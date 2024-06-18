@@ -14,7 +14,7 @@ Hello，这是[Vue3+TS+Node打造个人博客](https://juejin.cn/column/71774029
 
 [Vue3+TS+Node打造个人博客（后端架构）](https://juejin.cn/post/7072903323128594462)
 
-## 启动项目
+## 配置文件，必看
 
 因为后端项目通常涉及到一些私密信息，比如密钥、密码等，这些信息不适合在开源项目中公开。
 
@@ -24,11 +24,35 @@ Hello，这是[Vue3+TS+Node打造个人博客](https://juejin.cn/column/71774029
 
 比如，参照 dev.env.example.js，修改成 dev.env.js 文件。
 
-本项目依赖 pm2 启动，你需要安装 pm2。
+有些不清楚的配置字段可以留空，但是必须要有对应的字段，保证程序能运行起来。最后调试过程中发现缺什么，再补充什么。
+
+## 数据库配置
+
+联系我获取数据库初始化脚本，然后导入到自己的 MySQL 数据库中。
+
+## 开发环境启动项目
+
+启动命令：
 
 ```
-npm install pm2 -g
+npm start
 ```
+
+## 生产环境
+
+启动服务：
+
+```
+npm run start-prod
+```
+
+自动化部署参考这篇文章《[前端上手全栈自动化部署，让你看起来像个“高手”](https://juejin.cn/post/7373488886461431860)》。
+
+## Docker 运行和部署
+
+见[README.Docker.md](./README.Docker.md)
+
+## 资料 & 交流
 
 本项目依赖数据库 MySQL，相关数据库初始化脚本我上传到网盘了，请[联系我](https://qncdn.wbjiang.cn/%E5%85%AC%E4%BC%97%E5%8F%B7/qrcode_new.jpg)获取。
 
