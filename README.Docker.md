@@ -5,16 +5,16 @@
 1. 打镜像
 
 ```
-docker build -f Dockerfile.dev -t blog-express .
+docker build -f Dockerfile.dev -t blog-express-dev .
 ```
 
 2. 运行容器
 
 ```
 docker run -dp 8002:8002 \
---mount type=bind,source=./,target=/app \
---name blog-backend \
-blog-express
+--mount type=bind,source=${PWD},target=/app \
+--name blog-backend-dev \
+blog-express-dev
 ```
 
 ## Docker 生产环境部署

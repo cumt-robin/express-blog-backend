@@ -2,9 +2,10 @@
     "name": "express-blog-backend",
     "version": "2.1.3",
     "scripts": {
-        "start": "pm2 start ecosystem.config.js --watch",
+        "start": "pm2 start ecosystem.config.js",
         "start-prod": "pm2 start ecosystem.config.prod.js --env production",
         "restart": "pm2 restart blog",
+        "docker-dev": "pm2-dev start ecosystem.config.js",
         "deploy-setup:prod": "pm2 deploy production setup",
         "deploy:prod": "pm2 deploy production",
         "create-release": "release-it --ci"
@@ -42,7 +43,6 @@
         "@commitlint/config-conventional": "^13.1.0",
         "@release-it/conventional-changelog": "7.0.2",
         "cz-conventional-changelog": "^3.3.0",
-        "pm2": "^5.3.1",
         "release-it": "16.3.0"
     },
     "config": {

@@ -15,7 +15,8 @@ module.exports = {
                 NODE_ENV: "development",
                 PORT: 8002,
             },
-            ignore_watch: ["node_modules", ".git"]
+            watch: true,
+            ignore_watch: ["node_modules", ".git", ".github"]
         }
     ],
 };

@@ -8,6 +8,8 @@ ENV PORT 8002
 
 WORKDIR /app
 
+RUN npm install pm2-dev -g
+
 # Download dependencies as a separate step to take advantage of Docker's caching.
 # Leverage a cache mount to /root/.npm to speed up subsequent builds.
 # Leverage a bind mounts to package.json and package-lock.json to avoid having to copy them into
@@ -15,10 +17,7 @@ WORKDIR /app
 RUN --mount=type=bind,source=package.json,target=package.json \
     --mount=type=bind,source=package-lock.json,target=package-lock.json \
     --mount=type=cache,target=/root/.npm \
-    npm install
-
-# Run the application as a non-root user.
-USER node
+    npm ci
 
 # Copy the rest of the source files into the image.
 COPY . .
@@ -27,4 +26,4 @@ COPY . .
 EXPOSE 8002
 
 # Run the application.
-CMD ["npm", "start"]
+CMD ["npm", "run", "docker-dev"]

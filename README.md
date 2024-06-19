@@ -1,3 +1,5 @@
+# express-blog-backend ![release](https://img.shields.io/github/v/release/cumt-robin/express-blog-backend) ![license](https://img.shields.io/github/license/cumt-robin/express-blog-backend) ![stars](https://img.shields.io/github/stars/cumt-robin/express-blog-backend) ![building](https://img.shields.io/github/actions/workflow/status/cumt-robin/express-blog-backend/ci_cd.yml) ![lang](https://img.shields.io/github/languages/count/cumt-robin/express-blog-backend) ![commit](https://img.shields.io/github/last-commit/cumt-robin/express-blog-backend) ![release-date](https://img.shields.io/github/release-date/cumt-robin/express-blog-backend)
+
 Hello，这是[Vue3+TS+Node打造个人博客](https://juejin.cn/column/7177402980180688952)开源全栈项目的后端部分，采用 Nodejs 实现，应用框架是 Express。
 
 如果您需要找到前端源码，可以打开[vue3-ts-blog-frontend](https://github.com/cumt-robin/vue3-ts-blog-frontend)。
@@ -30,6 +32,14 @@ Hello，这是[Vue3+TS+Node打造个人博客](https://juejin.cn/column/71774029
 
 联系我获取数据库初始化脚本，然后导入到自己的 MySQL 数据库中。
 
+## 前置依赖
+
+如果您不是通过 Docker 启动项目，需要先安装 pm2。
+
+```
+npm install pm2 -g
+```
+
 ## 开发环境启动项目
 
 启动命令：
@@ -61,3 +71,7 @@ npm run start-prod
 希望本项目对你有帮助，欢迎 star。
 
 <img src="https://qncdn.wbjiang.cn/%E5%85%AC%E4%BC%97%E5%8F%B7/qrcode_new.jpg" style="width:200px;height:200px" />
+
+## Star History
+
+[![Star History Chart](https://api.star-history.com/svg?repos=cumt-robin/express-blog-backend&type=Date)](https://star-history.com/#cumt-robin/express-blog-backend&Date)
