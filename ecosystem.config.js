@@ -1,22 +1,18 @@
+// 适用于 docker dev 环境
 module.exports = {
-    /**
-    * Application configuration section
-    * http://pm2.keymetrics.io/docs/usage/application-declaration/
-    */
-    apps: [
-        // First application
+    "apps": [
         {
-            // 应用名
-            name: 'blog',
-            // 启动脚本
-            script: 'app.js',
-            // –env参数指定运行的环境
-            env: {
-                NODE_ENV: "development",
-                PORT: 8002,
+            "name": "blog",
+            "script": "app.js",
+            "env": {
+                "NODE_ENV": "development",
+                "PORT": 8002
             },
-            watch: true,
-            ignore_watch: ["node_modules", ".git", ".github"]
+            "watch": true,
+            "ignore_watch": ["node_modules", ".git", ".github", ".gitignore", ".dockerignore", ".release-it.cjs", "*.md"],
+            "watch_options": {
+                "usePolling": true
+            }
         }
-    ],
-};
+    ]
+}
