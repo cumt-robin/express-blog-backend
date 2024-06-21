@@ -1,5 +1,4 @@
-// 适用于本地开发环境
-module.exports = {
+{
     "apps": [
         {
             "name": "blog",
@@ -10,6 +9,9 @@ module.exports = {
             },
             "watch": true,
             "ignore_watch": ["node_modules", ".git", ".github", ".gitignore", ".dockerignore", ".release-it.cjs", "*.md"],
+            "watch_options": {
+                "usePolling": true
+            }
         }
     ]
 }
