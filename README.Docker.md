@@ -10,6 +10,8 @@ docker build -f Dockerfile.dev -t blog-express-dev .
 
 2. 运行容器
 
+dev.env.js 中的 mysql host 应该设置为你的 IP 地址，可以通过 ipconfig /all 命令查看。
+
 ```
 docker run -dp 8002:8002 \
 --mount type=bind,source=${PWD},target=/app \
@@ -30,4 +32,4 @@ docker run -dp 8002:8080 \
 registry.cn-hangzhou.aliyuncs.com/tusi_personal/blog-express:2.0.1
 ```
 
-具体部署和自动化流程参考[轻松学会 Nodejs Express 项目 Docker 部署]()
+具体部署和自动化流程参考[轻松学会 Nodejs Express 项目 Docker 部署](https://juejin.cn/post/7382484880288432165)
